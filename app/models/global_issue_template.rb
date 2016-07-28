@@ -43,7 +43,7 @@ class GlobalIssueTemplate < ActiveRecord::Base
   def template_json
     result = attributes
     template = {}
-    template[:issue_template] = result
+    template[:global_issue_template] = result
     template.to_json(root: true)
   end
 
