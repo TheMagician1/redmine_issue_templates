@@ -48,16 +48,22 @@ class IssueTemplatesController < ApplicationController
   end
 
   def show
-    checklist_enabled = false
-    checklist_enabled = true if defined? Checklist
-    render layout: !request.xhr?, locals: { checklist_enabled: checklist_enabled }
+    begin
+      checklist_enabled = Redmine::Plugin.registered_plugins.keys.include? :redmine_checklists
+    rescue
+      checklist_enabled = false
+    end
+    render layout: !request.xhr?, locals: { checklist_enabled: checklist_enabled } and return
   end
 
   def new
     # create empty instance
     @issue_template ||= IssueTemplate.new(author: @user, project: @project)
-    checklist_enabled = false
-    checklist_enabled = true if defined? Checklist
+    begin
+      checklist_enabled = Redmine::Plugin.registered_plugins.keys.include? :redmine_checklists
+    rescue
+      checklist_enabled = false
+    end
     if request.post?
       @issue_template.safe_attributes = params[:issue_template]
 
@@ -66,9 +72,9 @@ class IssueTemplatesController < ApplicationController
         json = params[:issue_template][:checklists].to_json
         @issue_template.checklist_json = json
       end
-      save_and_flash
+      save_and_flash and return
     end
-    render layout: !request.xhr?, locals: { checklist_enabled: checklist_enabled }
+    render layout: !request.xhr?, locals: { checklist_enabled: checklist_enabled } and return
   end
 
   def edit
