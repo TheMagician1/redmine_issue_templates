@@ -110,6 +110,13 @@
   function addCheckList() {
     var text = $('#checklist_text').val();
     if (text == '') return false;
+
+    $('.checklist-item').each(function(i, elem) {
+      e = $(elem)
+      if ((text == e.val())) {
+        return;
+      }
+    })
     addCheckListItem(text);
     $('#checklist_text').val('');
   }
@@ -121,6 +128,7 @@
       type: 'hidden',
       id: 'issue_template_checklist',
       name: 'issue_template[checklists][]',
+      class: 'checklist-item',
       value: value
     }).appendTo(li);
 
