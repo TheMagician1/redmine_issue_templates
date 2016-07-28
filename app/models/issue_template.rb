@@ -46,6 +46,23 @@ class IssueTemplate < ActiveRecord::Base
     end
   end
 
+  def checklist
+    #
+    # TODO: Exception handling
+    #
+    return [] if checklist_json.blank?
+    JSON.parse(checklist_json)
+  end
+
+  def template_json
+    result = attributes
+    result[:checklist] = checklist
+    result.delete('checklist_json')
+    template = {}
+    template[:issue_template] = result
+    template.to_json(root: true)
+  end
+
   #
   # Class method
   #

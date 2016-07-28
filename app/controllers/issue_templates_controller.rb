@@ -48,21 +48,38 @@ class IssueTemplatesController < ApplicationController
   end
 
   def show
+    checklist_enabled = false
+    checklist_enabled = true if defined? Checklist
+    render layout: !request.xhr?, locals: { checklist_enabled: checklist_enabled }
   end
 
   def new
     # create empty instance
     @issue_template ||= IssueTemplate.new(author: @user, project: @project)
+    checklist_enabled = false
+    checklist_enabled = true if defined? Checklist
     if request.post?
       @issue_template.safe_attributes = params[:issue_template]
+
+      if params[:issue_template][:checklists]
+        # TODO: save checklist data as json
+        json = params[:issue_template][:checklists].to_json
+        @issue_template.checklist_json = json
+      end
       save_and_flash
     end
+    render layout: !request.xhr?, locals: { checklist_enabled: checklist_enabled }
   end
 
   def edit
     # Change from request.post to request.patch for Rails4.
     if request.patch? || request.put?
       @issue_template.safe_attributes = params[:issue_template]
+      if params[:issue_template][:checklists]
+        # TODO: save checklist data as json
+        json = params[:issue_template][:checklists].to_json
+        @issue_template.checklist_json = json
+      end
       save_and_flash
     end
   end
@@ -80,12 +97,12 @@ class IssueTemplatesController < ApplicationController
   def load
     issue_template_id = params[:issue_template]
     template_type = params[:template_type]
-    @issue_template = if !template_type.blank? && template_type == 'global'
-                        GlobalIssueTemplate.find(issue_template_id)
-                      else
-                        IssueTemplate.find(issue_template_id)
-                      end
-    render text: @issue_template.to_json(root: true)
+    issue_template = if !template_type.blank? && template_type == 'global'
+                       GlobalIssueTemplate.find(issue_template_id)
+                     else
+                       IssueTemplate.find(issue_template_id)
+                     end
+    render text: issue_template.template_json
   end
 
   # update pulldown
