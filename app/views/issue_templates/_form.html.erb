@@ -134,15 +134,15 @@
 
     var remove_link = $("<a>", {
       class: 'icon icon-del',
-      click: "removeCheckList();"
-    });
-    remove_link.click(function(){
-      removeCheckList();
     });
 
     text.append(remove_link);
     li.append(text);
     checklist.append(li);
+
+    $('body').on('click','.icon.icon-del', function() {
+      removeCheckList(this);
+    });
   }
   //});
 </script>
