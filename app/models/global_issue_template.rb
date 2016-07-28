@@ -40,6 +40,13 @@ class GlobalIssueTemplate < ActiveRecord::Base
     position <=> global_issue_template.position
   end
 
+  def template_json
+    result = attributes
+    template = {}
+    template[:issue_template] = result
+    template.to_json(root: true)
+  end
+
   #
   # Class method
   #
